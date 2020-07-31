@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="SphericalStability.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="MPGOS">
+      <UniqueIdentifier>{849741f5-4b30-4281-ad79-666800cf18a3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MPGOS\SingleSystem_PerThread.cuh">
+      <Filter>MPGOS</Filter>
+    </ClInclude>
+    <ClInclude Include="MPGOS\SingleSystem_PerThread_RungeKutta.cuh">
+      <Filter>MPGOS</Filter>
+    </ClInclude>
+    <ClInclude Include="MPGOS\SingleSystem_PerThread_RungeKutta_DenseOutput.cuh">
+      <Filter>MPGOS</Filter>
+    </ClInclude>
+    <ClInclude Include="MPGOS\SingleSystem_PerThread_RungeKutta_ErrorController.cuh">
+      <Filter>MPGOS</Filter>
+    </ClInclude>
+    <ClInclude Include="MPGOS\SingleSystem_PerThread_RungeKutta_EventHandling.cuh">
+      <Filter>MPGOS</Filter>
+    </ClInclude>
+    <ClInclude Include="MPGOS\SingleSystem_PerThread_RungeKutta_LoadSharedVariables.cuh">
+      <Filter>MPGOS</Filter>
+    </ClInclude>
+    <ClInclude Include="MPGOS\SingleSystem_PerThread_RungeKutta_Steppers.cuh">
+      <Filter>MPGOS</Filter>
+    </ClInclude>
+    <ClInclude Include="SphericalStability_SystemDefinition.cuh" />
+    <ClInclude Include="MPGOS\MPGOS_Overloaded_MathFunction.cuh">
+      <Filter>MPGOS</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
