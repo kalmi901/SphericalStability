@@ -3,8 +3,8 @@ import sys
 
 
 def readDenseOutput(filename, index):
-    t = [];
-    x = [];
+    t = []
+    x = []
     header:bool = True
     with open(filename, 'r') as file:
         for row in file:

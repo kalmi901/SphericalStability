@@ -44,8 +44,8 @@ __device__ void PerThread_OdeFunction(int tid, int NT, double* F, double* X, dou
 		D = 1 / (1 + BL / R);
 
 		A = -sPAR[1 + i * 5] * F[1] * rx1 +
-			(sPAR[4 + i * 5] * 0.5 * cPAR[3] + 0.5*cPAR[4] * X[1] * (sPAR[4 + i * 5] - sPAR[3 + i * 5] * D)) * rx1*rx1*rx1;
-		B = 3 * X[1] * rx1 + 0.4 * cPAR[4] * rx1*rx1 *(sPAR[2 + i * 5] * D - sPAR[4 + i * 5]);
+			sPAR[4 + i * 5] * 0.5 * cPAR[3] *rx1*rx1*rx1 + 0.5*cPAR[4] * X[1] * (sPAR[4 + i * 5] - sPAR[3 + i * 5] * D) * rx1*rx1*rx1;
+		B = 3 * X[1] * rx1 + 0.5 * cPAR[4] * rx1*rx1 *(sPAR[2 + i * 5] * D - sPAR[4 + i * 5]);
 
 		F[i + 2] = X[i + NM + 2];
 		F[i + NM + 2] = -B * X[i + NM +2] - A * X[i + 2];
@@ -53,7 +53,7 @@ __device__ void PerThread_OdeFunction(int tid, int NT, double* F, double* X, dou
 	
 	/*if (tid == 0)
 	{
-		printf("%f, %f, %f \n", T, F[0], F[1]);
+		printf("%f, %f, %f \n", T, F[0], X[2]);
 	}*/
 }
 
@@ -81,8 +81,10 @@ __device__ void PerThread_Initialization(int tid, int NT, double T, double &dT, 
 
 __device__ void PerThread_Finalization(int tid, int NT, double T, double dT, double* TD, double* X, double* cPAR, double* sPAR, int* sPARi, double* ACC, int* ACCi)
 {
-	TD[0] = T;
-	printf("Thread %d is ready \n", tid);
+	TD[0]	= T;
+	ACC[0]	= X[0];
+	ACC[1]	= X[1];
+	//printf("Thread %d is ready \n", tid);
 }
 
 #endif
