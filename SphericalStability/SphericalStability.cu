@@ -30,7 +30,7 @@ const int NISP	= 0;     // NumberOfIntegerSharedParameters
 const int NE	= 1;     // NumberOfEvents
 const int NA	= 2;     // NumberOfAccessories
 const int NIA	= 0;     // NumberOfIntegerAccessories
-const int NDO	= 2000;     // NumberOfPointsOfDenseOutput
+const int NDO	= 0;     // NumberOfPointsOfDenseOutput
 
 void Linspace(vector<double>&, double, double, int);
 void Logspace(vector<double>&, double, double, int);
@@ -124,10 +124,11 @@ int main()
 			CollectedData[tid][4] = CheckSphericalStability.GetHost(tid, ControlParameters, 19);
 			CollectedData[tid][5] = CheckSphericalStability.GetHost(tid, ControlParameters, 20);
 		}
-
+		cout << "LaunchCounter: " << LaunchCounter << "/" << NumberOfSimulationLaunches - 1 << " ... ";
+		cout << "Transient Iterations ... ";
 		for (int i = 0; i < 1024; i++)
 		{
-			cout << "Transient Iteration: " << i << endl;
+			//cout << "Transient Iteration: " << i << endl;
 			CheckSphericalStability.Solve();
 			CheckSphericalStability.InsertSynchronisationPoint();
 			CheckSphericalStability.SynchroniseSolver();
@@ -147,9 +148,10 @@ int main()
 			
 		// Stability analysis and data collection
 		PerturbateSolverObject(CheckSphericalStability, NumberOfThreads);
-		for (int i = 0; i < 16; i++)
+		cout << "Stability Iterations ... ";
+		for (int i = 0; i < 32; i++)
 		{
-			cout << "Stability Iteration: " << i << endl;
+			//cout << "Stability Iteration: " << i << endl;
 			CheckSphericalStability.Solve();
 			CheckSphericalStability.InsertSynchronisationPoint();
 			CheckSphericalStability.SynchroniseSolver();
@@ -158,7 +160,7 @@ int main()
 		CheckSphericalStability.SynchroniseFromDeviceToHost(All);
 		CheckSphericalStability.InsertSynchronisationPoint();
 		CheckSphericalStability.SynchroniseSolver();
-
+		cout << "Done" << endl;
 		for (int tid = 0; tid < NumberOfThreads; tid++)
 		{
 			CollectedData[tid][7] = CheckSphericalStability.GetHost(tid, TimeDomain, 0);
@@ -179,9 +181,9 @@ int main()
 
 		for (int tid = 0; tid < NumberOfThreads; tid++)
 		{
-			for (int col = 0; col < 9 + NM; col++)
+			for (int col = 0; col < 10 + NM; col++)
 			{
-				if (col < (9 + NM - 1))
+				if (col < (10 + NM - 1))
 				{
 					DataFile.width(Width); DataFile << CollectedData[tid][col] << ',';
 				}
@@ -247,7 +249,7 @@ void FillSolverObject(ProblemSolver<NT, SD, NCP, NSP, NISP, NE, NA, NIA, NDO, SO
 	double P4; // frequency2          [kHz]
 
 	// Declaration of constant parameters
-	double P5 = 0.3*PI;	// phase shift          [-]
+	double P5 = 0.0*PI;	// phase shift          [-]
 	double P6 = 10.0;	// equilibrium radius   [mum]
 	double P7 = 1.0;	// ambient pressure     [bar]
 	double P9 = 1.4;	// polytrophic exponent [-]
