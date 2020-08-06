@@ -17,8 +17,8 @@ using namespace std;
 // Physical control parameters
 const int NumberOfFrequency1 = 101;
 const int NumberOfFrequency2 = 101;
-const int NumberOfAmplitude1 = 2;
-const int NumberOfAmplitude2 = 2;
+const int NumberOfAmplitude1 = 21;
+const int NumberOfAmplitude2 = 21;
 
 // Solver Configuration
 #define SOLVER RKCK45 // RK4, RKCK45
