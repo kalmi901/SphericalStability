@@ -17,8 +17,8 @@ using namespace std;
 // Physical control parameters
 const int NumberOfFrequency1 = 101;
 const int NumberOfFrequency2 = 101;
-const int NumberOfAmplitude1 = 21;
-const int NumberOfAmplitude2 = 21;
+const int NumberOfAmplitude1 = 3;
+const int NumberOfAmplitude2 = 3;
 
 // Solver Configuration
 #define SOLVER RKCK45 // RK4, RKCK45
@@ -28,7 +28,7 @@ const int NCP	= 23;    // NumberOfControlParameters
 const int NSP	= 5*NM;	 // NumberOfSharedParameters
 const int NISP	= 0;     // NumberOfIntegerSharedParameters
 const int NE	= 1;     // NumberOfEvents
-const int NA	= 2;     // NumberOfAccessories
+const int NA	= 3+NM;  // NumberOfAccessories
 const int NIA	= 0;     // NumberOfIntegerAccessories
 const int NDO	= 0;     // NumberOfPointsOfDenseOutput
 
@@ -85,12 +85,13 @@ int main()
 	int ProblemStartIndex;
 
 	vector< vector<double>> CollectedData;
-	CollectedData.resize(NumberOfThreads, vector<double>(NM + 10, 0));
+	CollectedData.resize(NumberOfThreads, vector<double>(NM + 11, 0));
 	// 6 physical paramters +
 	// 1 initial time of the stability analysis
 	// 1 end time of the stability analysis
 	// 2 state varialbes (x1, x2) before the stability analysis
 	// NM growth rates for each investiageted modes
+	// 1 Maximum Radius during stability analysis
 
 	double ActualPA1;
 	double ActualPA2;
@@ -134,7 +135,7 @@ int main()
 			CheckSphericalStability.SynchroniseSolver();
 		}
 	
-		// Collect date aifter the treandient iteration
+		// Collect data after the transient iteration
 		CheckSphericalStability.SynchroniseFromDeviceToHost(TimeDomain);
 		CheckSphericalStability.SynchroniseFromDeviceToHost(Accessories);
 		CheckSphericalStability.InsertSynchronisationPoint();
@@ -163,12 +164,14 @@ int main()
 		cout << "Done" << endl;
 		for (int tid = 0; tid < NumberOfThreads; tid++)
 		{
-			CollectedData[tid][7] = CheckSphericalStability.GetHost(tid, TimeDomain, 0);
+			CollectedData[tid][7]		= CheckSphericalStability.GetHost(tid, TimeDomain, 0);
+			CollectedData[tid][10 + NM] = CheckSphericalStability.GetHost(tid, Accessories, 2);
 
 			// Calculate Growth rates
 			for (int i = 0; i < NM; i++)
 			{
-				CollectedData[tid][10 + i] = log(abs(CheckSphericalStability.GetHost(tid, ActualState, i + 2)) / Perturbation) / (CollectedData[tid][7] - CollectedData[tid][6]);
+				//CollectedData[tid][10 + i] = log(abs(CheckSphericalStability.GetHost(tid, ActualState, i + 2)) / Perturbation) / (CollectedData[tid][7] - CollectedData[tid][6]);
+				CollectedData[tid][10 + i] = CheckSphericalStability.GetHost(tid, Accessories, i + 3) / (CollectedData[tid][7] - CollectedData[tid][6]);
 			}
 		}
 		
@@ -181,9 +184,9 @@ int main()
 
 		for (int tid = 0; tid < NumberOfThreads; tid++)
 		{
-			for (int col = 0; col < 10 + NM; col++)
+			for (int col = 0; col < 11 + NM; col++)
 			{
-				if (col < (10 + NM - 1))
+				if (col < (11 + NM - 1))
 				{
 					DataFile.width(Width); DataFile << CollectedData[tid][col] << ',';
 				}
@@ -310,6 +313,13 @@ void FillSolverObject(ProblemSolver<NT, SD, NCP, NSP, NISP, NE, NA, NIA, NDO, SO
 					Solver.SetHost(ProblemNumber, ActualState, 0, 1.0);
 					Solver.SetHost(ProblemNumber, ActualState, 1, 0.0);
 
+					// Accessories
+					Solver.SetHost(ProblemNumber, Accessories, 2, 0.0);
+					for (int i = 0; i < NM; i++)
+					{
+						Solver.SetHost(ProblemNumber, Accessories, 3 + i, 0.0);
+					}
+
 					// BLA - Initial Perturbation
 					for (int i = 2; i < 2 + 2 * NM; i++)
 					{
@@ -373,14 +383,23 @@ void PerturbateSolverObject(ProblemSolver<NT, SD, NCP, NSP, NISP, NE, NA, NIA, N
 	int ProblemNumber = 0;
 	while (ProblemNumber < NumberOfThreads)
 	{
+		// Perturbation
 		for (int i = 2; i < 2 + 2 * NM; i++)
 		{
 			if (i < 2 + NM) { Solver.SetHost(ProblemNumber, ActualState, i, Perturbation); }
 			else			{ Solver.SetHost(ProblemNumber, ActualState, i, 0.0);  }
 		}
+
+		// Accessories
+		Solver.SetHost(ProblemNumber, Accessories, 2, 0.0);
+		for (int i = 0; i < NM; i++)
+		{
+			Solver.SetHost(ProblemNumber, Accessories, 3 + i, 0.0);
+		}
 		ProblemNumber++;
 	}
 	Solver.SynchroniseFromHostToDevice(ActualState);
+	Solver.SynchroniseFromHostToDevice(Accessories);
 	Solver.InsertSynchronisationPoint();
 	Solver.SynchroniseSolver();
 }

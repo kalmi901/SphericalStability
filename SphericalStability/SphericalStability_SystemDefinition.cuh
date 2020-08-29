@@ -84,6 +84,24 @@ __device__ void PerThread_Finalization(int tid, int NT, double T, double dT, dou
 	TD[0]	= T;
 	ACC[0]	= X[0];
 	ACC[1]	= X[1];
+
+	if (ACC[2] < X[0])
+	{
+		ACC[2] = X[0];
+	}
+
+	double r;
+	for (int i = 0; i < NM; i++)
+	{
+		r = abs(X[i + 2] / Perturbation);
+		if (r > 0)
+		{
+			X[i + 2]		/= r;
+			X[i + 2 + NM]	/= r;
+			ACC[i + 3] += log(r);
+		}
+	}
+
 	//printf("Thread %d is ready \n", tid);
 }
 
