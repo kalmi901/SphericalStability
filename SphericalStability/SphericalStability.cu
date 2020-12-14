@@ -17,8 +17,8 @@ using namespace std;
 // Physical control parameters
 const int NumberOfFrequency1 = 101;
 const int NumberOfFrequency2 = 101;
-const int NumberOfAmplitude1 = 3;
-const int NumberOfAmplitude2 = 3;
+const int NumberOfAmplitude1 = 6;
+const int NumberOfAmplitude2 = 6;
 
 // Solver Configuration
 #define SOLVER RKCK45 // RK4, RKCK45
@@ -49,8 +49,8 @@ int main()
 
 	Logspace(Frequency1, 20.0, 2000.0, NumberOfFrequency1);
 	Logspace(Frequency2, 20.0, 2000.0, NumberOfFrequency2);
-	Linspace(Amplitude1, 0.0, 2.0, NumberOfAmplitude1);
-	Linspace(Amplitude2, 0.0, 2.0, NumberOfAmplitude2);
+	Linspace(Amplitude1, 0.0, 1.0, NumberOfAmplitude1);
+	Linspace(Amplitude2, 0.0, 1.0, NumberOfAmplitude2);
 
 	// Setup CUDA a device
 	ListCUDADevices();
@@ -68,16 +68,17 @@ int main()
 	ProblemSolver<NT, SD, NCP, NSP, NISP, NE, NA, NIA, NDO, SOLVER, double> CheckSphericalStability(SelectedDevice);
 
 	CheckSphericalStability.SolverOption(ThreadsPerBlock, BlockSize);
-	CheckSphericalStability.SolverOption(RelativeTolerance, 0, 1e-12);
-	CheckSphericalStability.SolverOption(AbsoluteTolerance, 1, 1e-12);
+	CheckSphericalStability.SolverOption(RelativeTolerance, 0, 1e-10);
+	CheckSphericalStability.SolverOption(AbsoluteTolerance, 1, 1e-10);
 	for (int i = 2; i < SD; i++)	// Set tolerance of Surface Dynamics
 	{
-		CheckSphericalStability.SolverOption(RelativeTolerance, 0, 1e-12);
-		CheckSphericalStability.SolverOption(AbsoluteTolerance, 1, 1e-12);
+		CheckSphericalStability.SolverOption(RelativeTolerance, 0, 1e-10);
+		CheckSphericalStability.SolverOption(AbsoluteTolerance, 1, 1e-10);
 	}
 	CheckSphericalStability.SolverOption(EventDirection, 0, -1);
 	CheckSphericalStability.SolverOption(EventStopCounter, 0, 1);
 	CheckSphericalStability.SolverOption(DenseOutputTimeStep, -1e-2);
+	CheckSphericalStability.SolverOption(MinimumTimeStep, 1e-15);
 
 	// SIMULATIONS ------------------------------------------------------------------------------------
 
@@ -129,7 +130,7 @@ int main()
 		cout << "Transient Iterations ... ";
 		for (int i = 0; i < 1024; i++)
 		{
-			//cout << "Transient Iteration: " << i << endl;
+			cout << "Transient Iteration: " << i << endl;
 			CheckSphericalStability.Solve();
 			CheckSphericalStability.InsertSynchronisationPoint();
 			CheckSphericalStability.SynchroniseSolver();
@@ -150,12 +151,15 @@ int main()
 		// Stability analysis and data collection
 		PerturbateSolverObject(CheckSphericalStability, NumberOfThreads);
 		cout << "Stability Iterations ... ";
-		for (int i = 0; i < 32; i++)
+		for (int i = 0; i < 1024; i++)
 		{
-			//cout << "Stability Iteration: " << i << endl;
+			cout << "Stability Iteration: " << i << endl;
 			CheckSphericalStability.Solve();
+			//CheckSphericalStability.SynchroniseFromDeviceToHost(All);
 			CheckSphericalStability.InsertSynchronisationPoint();
 			CheckSphericalStability.SynchroniseSolver();
+			//CheckSphericalStability.Print(DenseOutput, 1010);
+			//cin.get();
 		}
 
 		CheckSphericalStability.SynchroniseFromDeviceToHost(All);
@@ -253,7 +257,7 @@ void FillSolverObject(ProblemSolver<NT, SD, NCP, NSP, NISP, NE, NA, NIA, NDO, SO
 
 	// Declaration of constant parameters
 	double P5 = 0.0*PI;	// phase shift          [-]
-	double P6 = 10.0;	// equilibrium radius   [mum]
+	double P6 = 3.0;	// equilibrium radius   [mum]
 	double P7 = 1.0;	// ambient pressure     [bar]
 	double P9 = 1.4;	// polytrophic exponent [-]
 

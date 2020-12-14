@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import math
 import sys
 
 
@@ -29,6 +30,8 @@ print([t[-1], x[-1]])
 plt.figure(1)
 plt.subplots_adjust(0.1, 0.1, 0.98, 0.95)
 plt.plot(t, x, 'b-', linewidth=2)
+#plt.plot(t, [abs(x[i]) for i in range(0, len(x))], 'b-', linewidth=2)
+#plt.yscale("log")
 plt.xlabel('time')
 plt.ylabel('x'+sys.argv[2])
 plt.grid('both')

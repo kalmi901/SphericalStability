@@ -71,12 +71,31 @@ __device__ void PerThread_ActionAfterEventDetection(int tid, int NT, int IDX, in
 // ACCESSORIES
 __device__ void PerThread_ActionAfterSuccessfulTimeStep(int tid, int NT, double T, double dT, double* TD, double* X, double* cPAR, double* sPAR, int* sPARi, double* ACC, int* ACCi)
 {
-
+	double r;
+	for (int i = 0; i < NM; i++)
+	{
+		if (X[i + 2] != 0)
+		{
+			if (abs(X[i + 2]) < 1e-16 || abs(X[i + 2]) > 1e0)
+			{
+				r = abs(X[i + 2] / Perturbation);
+				X[i + 2]		/= r;
+				X[i + 2 + NM]	/= r;
+				ACC[i + 3]	+= log(r);
+				//if (tid = 1010) { printf("\nPerturbation reset at thread_id: %d in case of mode: %d", tid, i + 2); }
+			}
+		}
+	}
 }
 
 __device__ void PerThread_Initialization(int tid, int NT, double T, double &dT, double* TD, double* X, double* cPAR, double* sPAR, int* sPARi, double* ACC, int* ACCi)
 {
-
+	/*if (tid == 1010)
+	{
+		printf("\nThread %d is Initialized \n", tid);
+		printf("x[0] = %f, x[1] = %f, a2 = %e, a3 = %e, a4 = %e, a5 = %e, a6 = %e, r6 = %f",
+			X[0], X[1], X[2], X[3], X[4], X[5], X[6], 0);
+	}*/
 }
 
 __device__ void PerThread_Finalization(int tid, int NT, double T, double dT, double* TD, double* X, double* cPAR, double* sPAR, int* sPARi, double* ACC, int* ACCi)
@@ -90,7 +109,13 @@ __device__ void PerThread_Finalization(int tid, int NT, double T, double dT, dou
 		ACC[2] = X[0];
 	}
 
-	double r;
+	double r{ 0 };
+	/*if (tid == 1010)
+	{
+		printf("\nThread %d is ready \n", tid);
+		printf("x[0] = %f, x[1] = %f, a2 = %e, a3 = %e, a4 = %e, a5 = %e, a6 = %e, r6 = %f",
+				X[0], X[1], X[2], X[3], X[4], X[5], X[6], r);
+	}*/
 	for (int i = 0; i < NM; i++)
 	{
 		r = abs(X[i + 2] / Perturbation);
@@ -102,7 +127,6 @@ __device__ void PerThread_Finalization(int tid, int NT, double T, double dT, dou
 		}
 	}
 
-	//printf("Thread %d is ready \n", tid);
 }
 
 #endif
