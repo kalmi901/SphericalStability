@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-constexpr int			   NM = 5;				// Number of Investigated Modes
-constexpr double Perturbation = 1e-3;
+#define NM 5				// Number of Investigated Modes
+#define Perturbation 1e-3
 
 #include "SphericalStability_SystemDefinition.cuh"
 #include "MPGOS/SingleSystem_PerThread.cuh"
