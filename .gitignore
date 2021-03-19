@@ -1,6 +1,5 @@
 *.txt
 x64/*
 .vs/*
-SphericalStability/MPGOS/*
 SphericalStability/x64/*
 CompareResults.py

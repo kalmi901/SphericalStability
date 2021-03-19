@@ -151,7 +151,7 @@ int main()
 		// Stability analysis and data collection
 		PerturbateSolverObject(CheckSphericalStability, NumberOfThreads);
 		cout << "Stability Iterations ... ";
-		for (int i = 0; i < 1024; i++)
+		for (int i = 0; i < 256; i++)
 		{
 			cout << "Stability Iteration: " << i << endl;
 			CheckSphericalStability.Solve();
