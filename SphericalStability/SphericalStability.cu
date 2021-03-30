@@ -69,11 +69,13 @@ int main()
 
 	CheckSphericalStability.SolverOption(ThreadsPerBlock, BlockSize);
 	CheckSphericalStability.SolverOption(RelativeTolerance, 0, 1e-10);
+	CheckSphericalStability.SolverOption(AbsoluteTolerance, 0, 1e-10);
+	CheckSphericalStability.SolverOption(RelativeTolerance, 1, 1e-10);
 	CheckSphericalStability.SolverOption(AbsoluteTolerance, 1, 1e-10);
 	for (int i = 2; i < SD; i++)	// Set tolerance of Surface Dynamics
 	{
-		CheckSphericalStability.SolverOption(RelativeTolerance, 0, 1e-10);
-		CheckSphericalStability.SolverOption(AbsoluteTolerance, 1, 1e-10);
+		CheckSphericalStability.SolverOption(RelativeTolerance, i, 1e-8);
+		CheckSphericalStability.SolverOption(AbsoluteTolerance, i, 1e-8);
 	}
 	CheckSphericalStability.SolverOption(EventDirection, 0, -1);
 	CheckSphericalStability.SolverOption(EventStopCounter, 0, 1);
@@ -130,7 +132,7 @@ int main()
 		cout << "Transient Iterations ... ";
 		for (int i = 0; i < 1024; i++)
 		{
-			cout << "Transient Iteration: " << i << endl;
+			//cout << "Transient Iteration: " << i << endl;
 			CheckSphericalStability.Solve();
 			CheckSphericalStability.InsertSynchronisationPoint();
 			CheckSphericalStability.SynchroniseSolver();
@@ -153,7 +155,7 @@ int main()
 		cout << "Stability Iterations ... ";
 		for (int i = 0; i < 256; i++)
 		{
-			cout << "Stability Iteration: " << i << endl;
+			//cout << "Stability Iteration: " << i << endl;
 			CheckSphericalStability.Solve();
 			//CheckSphericalStability.SynchroniseFromDeviceToHost(All);
 			CheckSphericalStability.InsertSynchronisationPoint();
